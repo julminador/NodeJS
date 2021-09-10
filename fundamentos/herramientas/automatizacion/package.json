@@ -1,0 +1,14 @@
+{
+  "name": "automatizacion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "y",
+  "scripts": {
+    "test": "",
+    "build": "gulp build",
+    "start": "gulp",
+    "serve": "gulp serve"
+  },
+  "author": "",
+  "license": "ISC"
+}
