@@ -1,54 +1,40 @@
-const { MongoClient, ObjectId } = require('mongodb');
-const {config} = require('../../config');
-
-const USER = encodeURIComponent(config.DB_USER);
-const PASSWORD = encodeURIComponent(config.DB_PASSWORD);
-const DB_NAME = encodeURIComponent(config.DB_NAME);
-
-const MONGO_URI = `mongodb+srv://${USER}:${PASSWORD}@${config.DB_HOST}:${config.port}/${DB_NAME}?retryWrites=true&w=majority`;
-
-class MongoLib {
-    constructor(){
-        this.client = new MongoClient(MONGO_URI, {useNewUrlParser: true });
-        this.db_name = DB_NAME;
-    }
-    connect(){
-        if(MongoLib.connection){
-            MongoLib.connection = new Promise((resolve, reject) => {
-                this.client.connect( err => {
-                    if(err){
-                        reject(err);
-                    }
-                    console.log('conectado');
-                    resolve(this.client.db(this.db_name));    
-                });
-            });
-        }
-        return MongoLib.connection;
-    }
-}
-
-module.exports = MongoLib;
-
-
-
-
-const { get } = require("./network");
-
-const list = [];
+//conexión a mongodb atlas
+const Model = require("./model");
 
 function addMessage(message) {
-    list.push(message);
+    const myMessage = new Model(message); //Instancia de clase del modelo
+    myMessage.save(); //Añade el mensaje a la base de datos
 }
 
-function getMessage() {
-    return list;
+//Funcion asincrona
+async function getMessages(filterUser) {
+    let filter = {};
+    if (filterUser !== null) {
+        filter = { user: filterUser };
+    }
+    const messages = await Model.find(filter);
+    return messages;
+}
+
+async function updateText(id, message) {
+    const foundMessage = await Model.findOne({
+        _id: id,
+    })
+
+    foundMessage.message = message;
+    const newMessage = foundMessage.save();
+    return newMessage;
+}
+
+function removeMessage(id) {
+    return Model.deleteOne({
+        _id: id
+    });
 }
 
 module.exports = {
     add: addMessage,
-    list: getMessage,
-    //get
-    // update
-    // delete
+    list: getMessages,
+    updateText: updateText,
+    remove: removeMessage,
 }
