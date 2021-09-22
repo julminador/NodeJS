@@ -4,12 +4,20 @@ const Schema = mongoose.Schema;
 
 //A travez de un objeto definimos propiedates y tipos
 const mySchema = new Schema({
-    user: String,
+    chat: {
+        type: Schema.ObjectId,
+        ref: 'Chat',
+    },
+    user: {
+        type: Schema.ObjectId,
+        ref: 'User',
+    },
     message: { //En un objeto para definir el mensaje
         type: String,
         require: true, //Siempre debe venir el mensaje
     },
     date: Date,
+    file: String,
 });
 
 /*Todo lo que se crea se guarda con este nombre

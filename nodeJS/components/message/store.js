@@ -1,4 +1,5 @@
 //conexión a mongodb atlas
+const { populate } = require("./model");
 const Model = require("./model");
 
 function addMessage(message) {
@@ -7,13 +8,23 @@ function addMessage(message) {
 }
 
 //Funcion asincrona
-async function getMessages(filterUser) {
-    let filter = {};
-    if (filterUser !== null) {
-        filter = { user: filterUser };
-    }
-    const messages = await Model.find(filter);
-    return messages;
+function getMessages(filterUser) {
+    return new Promise((resolve, reject) => {
+        let filter = {};
+        if (filterUser !== null) {
+            filter = { user: filterUser };
+        }
+        const messages = Model.find(filter)
+            .populate('user')
+            .exec((error, populated) => {
+                if (error) {
+                    reject(error);
+                    return false;
+                }
+
+                resolve(populated)
+            });
+    })
 }
 
 async function updateText(id, message) {
